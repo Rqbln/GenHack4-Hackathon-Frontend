@@ -7,6 +7,7 @@ import StationTooltip from './StationTooltip'
 import TimeSeriesChart from './TimeSeriesChart'
 import TimelineSlider from './TimelineSlider'
 import BackendConnectionStatus from './BackendConnectionStatus'
+import DemoMode from './DemoMode'
 import { useAsyncLayer } from '../hooks/useAsyncLayer'
 import type { Station, StationData } from '../types/station'
 
@@ -56,6 +57,7 @@ export default function MapView() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null)
   const [stationData, setStationData] = useState<StationData[]>([])
   const [currentDate, setCurrentDate] = useState(new Date('2020-01-01'))
+  const [demoMode, setDemoMode] = useState(false)
 
   // Timeline dates
   const startDate = new Date('2020-01-01')
@@ -149,6 +151,9 @@ export default function MapView() {
       
       {/* Backend Connection Status */}
       <BackendConnectionStatus />
+
+      {/* Demo Mode */}
+      <DemoMode onToggle={setDemoMode} />
 
       {/* Info overlay */}
       <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg max-w-sm">
