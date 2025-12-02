@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import Map from 'react-map-gl/maplibre'
 import DeckGL from '@deck.gl/react'
 import type { PickingInfo } from '@deck.gl/core'
@@ -6,6 +6,8 @@ import { createStationLayer } from './StationLayer'
 import StationTooltip from './StationTooltip'
 import TimeSeriesChart from './TimeSeriesChart'
 import TimelineSlider from './TimelineSlider'
+import BackendConnectionStatus from './BackendConnectionStatus'
+import { useAsyncLayer } from '../hooks/useAsyncLayer'
 import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
@@ -77,8 +79,8 @@ export default function MapView() {
     setStationData(mockData)
   }
 
-  // Create station layer
-  const stationLayer = useMemo(() => {
+  // Create station layer with async loading for performance
+  const createStationLayerAsync = useCallback(() => {
     return createStationLayer({
       stations: MOCK_STATIONS,
       selectedStationId: selectedStation?.staid,
@@ -91,7 +93,20 @@ export default function MapView() {
     })
   }, [selectedStation])
 
-  const layers = [stationLayer].filter(Boolean)
+  const [stationLayer, _stationLoading, _stationError] = useAsyncLayer(
+    createStationLayerAsync,
+    [selectedStation],
+    {
+      enabled: true,
+      onError: (error) => {
+        console.error('Failed to load station layer:', error)
+      }
+    }
+  )
+
+  const layers = useMemo(() => {
+    return [stationLayer].filter(Boolean)
+  }, [stationLayer])
 
   // Handle hover for tooltip
   const handleHover = (info: PickingInfo) => {
@@ -132,6 +147,9 @@ export default function MapView() {
         />
       )}
       
+      {/* Backend Connection Status */}
+      <BackendConnectionStatus />
+
       {/* Info overlay */}
       <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg max-w-sm">
         <h1 className="text-xl font-bold mb-2">GenHack 2025 - Climate Heat Dashboard</h1>
