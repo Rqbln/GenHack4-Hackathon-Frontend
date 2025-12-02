@@ -44,7 +44,7 @@ export default function BackendConnectionStatus({
 
   return (
     <div
-      className={`absolute top-4 right-4 px-3 py-2 rounded-lg text-xs font-semibold ${
+      className={`absolute top-4 right-4 glass-dark px-3 py-2 rounded-lg text-xs font-semibold fade-in hover-lift ${
         connected
           ? 'bg-green-900 bg-opacity-90 text-green-300'
           : 'bg-red-900 bg-opacity-90 text-red-300'
