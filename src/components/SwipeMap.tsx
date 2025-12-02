@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import Map from 'react-map-gl/maplibre'
 import DeckGL from '@deck.gl/react'
-import type { PickingInfo } from '@deck.gl/core'
 import { createStationLayer } from './StationLayer'
 import { createHeatmapLayer } from './HeatmapLayer'
 import type { Station } from '../types/station'
@@ -54,7 +53,7 @@ export default function SwipeMap({
     }),
     createStationLayer({
       stations,
-      selectedStationId: null,
+      selectedStationId: undefined,
       onStationClick: () => {},
       visible: true
     })
@@ -70,7 +69,7 @@ export default function SwipeMap({
     }),
     createStationLayer({
       stations,
-      selectedStationId: null,
+      selectedStationId: undefined,
       onStationClick: () => {},
       visible: true
     })
