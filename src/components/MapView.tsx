@@ -57,7 +57,7 @@ export default function MapView() {
   const [selectedStation, setSelectedStation] = useState<Station | null>(null)
   const [stationData, setStationData] = useState<StationData[]>([])
   const [currentDate, setCurrentDate] = useState(new Date('2020-01-01'))
-  const [demoMode, setDemoMode] = useState(false)
+  const [_demoMode, setDemoMode] = useState(false)
 
   // Timeline dates
   const startDate = new Date('2020-01-01')
