@@ -8,7 +8,9 @@ import TimeSeriesChart from './TimeSeriesChart'
 import TimelineSlider from './TimelineSlider'
 import BackendConnectionStatus from './BackendConnectionStatus'
 import DemoMode from './DemoMode'
+import { createHeatmapLayer } from './HeatmapLayer'
 import { useAsyncLayer } from '../hooks/useAsyncLayer'
+import { useHeatmapData } from '../hooks/useHeatmapData'
 import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
@@ -106,9 +108,26 @@ export default function MapView() {
     }
   )
 
+  // Heatmap data
+  const { data: heatmapData, loading: heatmapLoading } = useHeatmapData({
+    date: currentDate,
+    variable: 'temperature',
+    enabled: true
+  })
+
+  // Create heatmap layer
+  const heatmapLayer = useMemo(() => {
+    return createHeatmapLayer({
+      data: heatmapData,
+      radiusPixels: 50,
+      intensity: 1.5,
+      visible: !heatmapLoading && heatmapData.length > 0
+    })
+  }, [heatmapData, heatmapLoading])
+
   const layers = useMemo(() => {
-    return [stationLayer].filter(Boolean)
-  }, [stationLayer])
+    return [stationLayer, heatmapLayer].filter(Boolean)
+  }, [stationLayer, heatmapLayer])
 
   // Handle hover for tooltip
   const handleHover = (info: PickingInfo) => {
