@@ -3,7 +3,8 @@ import Map from 'react-map-gl/maplibre'
 import DeckGL, { PickingInfo } from '@deck.gl/react'
 import { createStationLayer } from './StationLayer'
 import StationTooltip from './StationTooltip'
-import { Station } from '../types/station'
+import TimeSeriesChart from './TimeSeriesChart'
+import { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -49,6 +50,25 @@ export default function MapView() {
   const [hoveredStation, setHoveredStation] = useState<Station | null>(null)
   const [hoveredPosition, setHoveredPosition] = useState<{ x: number; y: number } | null>(null)
   const [selectedStation, setSelectedStation] = useState<Station | null>(null)
+  const [stationData, setStationData] = useState<StationData[]>([])
+
+  // Mock time series data (will be replaced with real ECA&D data)
+  const loadStationData = (station: Station) => {
+    // Generate mock time series data
+    const mockData: StationData[] = []
+    const startDate = new Date('2020-01-01')
+    for (let i = 0; i < 365; i++) {
+      const date = new Date(startDate)
+      date.setDate(date.getDate() + i)
+      mockData.push({
+        station,
+        date: date.toISOString().split('T')[0],
+        temperature: 15 + 10 * Math.sin((i / 365) * 2 * Math.PI) + Math.random() * 5,
+        quality: 0
+      })
+    }
+    setStationData(mockData)
+  }
 
   // Create station layer
   const stationLayer = useMemo(() => {
@@ -57,6 +77,7 @@ export default function MapView() {
       selectedStationId: selectedStation?.staid,
       onStationClick: (station) => {
         setSelectedStation(station)
+        loadStationData(station)
         console.log('Station selected:', station)
       },
       visible: true
@@ -101,19 +122,33 @@ export default function MapView() {
       )}
       
       {/* Info overlay */}
-      <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg">
+      <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg max-w-sm">
         <h1 className="text-xl font-bold mb-2">GenHack 2025 - Climate Heat Dashboard</h1>
         <p className="text-sm text-gray-300 mb-2">
           {MOCK_STATIONS.length} weather stations loaded
         </p>
         {selectedStation && (
           <div className="mt-2 pt-2 border-t border-gray-600">
-            <p className="text-xs text-yellow-400">
+            <p className="text-xs text-yellow-400 mb-2">
               Selected: {selectedStation.staname}
             </p>
           </div>
         )}
       </div>
+
+      {/* Time Series Chart Panel */}
+      {selectedStation && stationData.length > 0 && (
+        <div className="absolute bottom-4 left-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl max-w-4xl">
+          <TimeSeriesChart
+            data={stationData}
+            stationName={selectedStation.staname}
+            onPointClick={(data) => {
+              console.log('Point clicked:', data)
+              // Could update map view to this date
+            }}
+          />
+        </div>
+      )}
     </div>
   )
 }
