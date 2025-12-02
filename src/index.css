@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import custom animations */
+@import './styles/animations.css';
+
 /* Import design system */
 @import './styles/design-system.css';
 

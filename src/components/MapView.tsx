@@ -174,8 +174,8 @@ export default function MapView() {
       {/* Demo Mode */}
       <DemoMode onToggle={setDemoMode} />
 
-      {/* Info overlay */}
-      <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg max-w-sm">
+      {/* Info overlay with glassmorphism */}
+      <div className="absolute top-4 left-4 glass-dark p-4 rounded-lg shadow-lg max-w-sm fade-in">
         <h1 className="text-xl font-bold mb-2">GenHack 2025 - Climate Heat Dashboard</h1>
         <p className="text-sm text-gray-300 mb-2">
           {MOCK_STATIONS.length} weather stations loaded
@@ -189,9 +189,10 @@ export default function MapView() {
         )}
       </div>
 
-      {/* Timeline Slider */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4">
-        <TimelineSlider
+      {/* Timeline Slider with glassmorphism */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom">
+        <div className="glass-dark rounded-lg p-4">
+          <TimelineSlider
           startDate={startDate}
           endDate={endDate}
           currentDate={currentDate}
@@ -204,9 +205,9 @@ export default function MapView() {
         />
       </div>
 
-      {/* Time Series Chart Panel */}
+      {/* Time Series Chart Panel with glassmorphism */}
       {selectedStation && stationData.length > 0 && (
-        <div className="absolute bottom-24 left-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl max-w-4xl">
+        <div className="absolute bottom-24 left-4 right-4 glass-dark p-4 rounded-lg shadow-xl max-w-4xl scale-in">
           <TimeSeriesChart
             data={stationData}
             stationName={selectedStation.staname}

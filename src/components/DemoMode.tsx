@@ -21,7 +21,7 @@ export default function DemoMode({ onToggle }: DemoModeProps) {
     return (
       <button
         onClick={handleToggle}
-        className="absolute bottom-20 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg font-semibold z-50 animate-pulse-glow"
+        className="absolute bottom-20 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg font-semibold z-50 pulse-glow hover-lift transition-smooth"
         title="Enable demo mode for video capture"
       >
         🎬 Demo Mode
@@ -30,7 +30,7 @@ export default function DemoMode({ onToggle }: DemoModeProps) {
   }
 
   return (
-    <div className="absolute bottom-20 right-4 bg-gray-900 bg-opacity-95 p-4 rounded-lg shadow-xl border border-blue-500 z-50 max-w-sm">
+    <div className="absolute bottom-20 right-4 glass-dark p-4 rounded-lg shadow-xl border border-blue-500 z-50 max-w-sm scale-in">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-bold text-white">🎬 Demo Mode Active</h3>
         <button
