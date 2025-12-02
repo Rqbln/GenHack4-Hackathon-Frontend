@@ -1,5 +1,5 @@
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts'
-import { StationData } from '../types/station'
+import type { StationData } from '../types/station'
 
 interface TimeSeriesChartProps {
   data: StationData[]

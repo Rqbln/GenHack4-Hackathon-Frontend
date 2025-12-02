@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* MapLibre GL CSS */
-@import 'maplibre-gl/dist/maplibre-gl.css';
-
 /* Dark mode base */
 :root {
   --bg-primary: #0a0a0a;

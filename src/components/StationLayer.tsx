@@ -1,5 +1,5 @@
 import { ScatterplotLayer } from '@deck.gl/layers'
-import { Station } from '../types/station'
+import type { Station } from '../types/station'
 
 export interface StationLayerProps {
   stations: Station[]
@@ -42,7 +42,7 @@ export function createStationLayer(props: StationLayerProps): ScatterplotLayer |
         onStationClick(info.object as Station)
       }
     },
-    onHover: (info) => {
+    onHover: (_info) => {
       // Tooltip will be handled by parent component
     },
     updateTriggers: {

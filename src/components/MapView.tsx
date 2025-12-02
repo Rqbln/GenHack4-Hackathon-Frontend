@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react'
 import Map from 'react-map-gl/maplibre'
-import DeckGL, { PickingInfo } from '@deck.gl/react'
+import DeckGL from '@deck.gl/react'
+import type { PickingInfo } from '@deck.gl/core'
 import { createStationLayer } from './StationLayer'
 import StationTooltip from './StationTooltip'
 import TimeSeriesChart from './TimeSeriesChart'
-import { Station, StationData } from '../types/station'
+import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
@@ -101,7 +102,11 @@ export default function MapView() {
     <div className="relative w-full h-full">
       <DeckGL
         viewState={viewState}
-        onViewStateChange={({ viewState }) => setViewState(viewState)}
+        onViewStateChange={(evt: any) => {
+          if (evt.viewState && typeof evt.viewState === 'object') {
+            setViewState(evt.viewState as typeof viewState)
+          }
+        }}
         controller={true}
         layers={layers}
         onHover={handleHover}
