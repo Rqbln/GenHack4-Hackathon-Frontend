@@ -193,16 +193,17 @@ export default function MapView() {
       <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom">
         <div className="glass-dark rounded-lg p-4">
           <TimelineSlider
-          startDate={startDate}
-          endDate={endDate}
-          currentDate={currentDate}
-          onDateChange={(date) => {
-            setCurrentDate(date)
-            console.log('Date changed to:', date)
-            // Update layers based on date
-          }}
-          step="month"
-        />
+            startDate={startDate}
+            endDate={endDate}
+            currentDate={currentDate}
+            onDateChange={(date) => {
+              setCurrentDate(date)
+              console.log('Date changed to:', date)
+              // Update layers based on date
+            }}
+            step="month"
+          />
+        </div>
       </div>
 
       {/* Time Series Chart Panel with glassmorphism */}
