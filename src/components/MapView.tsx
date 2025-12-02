@@ -5,6 +5,7 @@ import type { PickingInfo } from '@deck.gl/core'
 import { createStationLayer } from './StationLayer'
 import StationTooltip from './StationTooltip'
 import TimeSeriesChart from './TimeSeriesChart'
+import TimelineSlider from './TimelineSlider'
 import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
@@ -52,6 +53,11 @@ export default function MapView() {
   const [hoveredPosition, setHoveredPosition] = useState<{ x: number; y: number } | null>(null)
   const [selectedStation, setSelectedStation] = useState<Station | null>(null)
   const [stationData, setStationData] = useState<StationData[]>([])
+  const [currentDate, setCurrentDate] = useState(new Date('2020-01-01'))
+
+  // Timeline dates
+  const startDate = new Date('2020-01-01')
+  const endDate = new Date('2021-12-31')
 
   // Mock time series data (will be replaced with real ECA&D data)
   const loadStationData = (station: Station) => {
@@ -141,15 +147,31 @@ export default function MapView() {
         )}
       </div>
 
+      {/* Timeline Slider */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4">
+        <TimelineSlider
+          startDate={startDate}
+          endDate={endDate}
+          currentDate={currentDate}
+          onDateChange={(date) => {
+            setCurrentDate(date)
+            console.log('Date changed to:', date)
+            // Update layers based on date
+          }}
+          step="month"
+        />
+      </div>
+
       {/* Time Series Chart Panel */}
       {selectedStation && stationData.length > 0 && (
-        <div className="absolute bottom-4 left-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl max-w-4xl">
+        <div className="absolute bottom-24 left-4 right-4 bg-gray-800 bg-opacity-95 p-4 rounded-lg shadow-xl max-w-4xl">
           <TimeSeriesChart
             data={stationData}
             stationName={selectedStation.staname}
             onPointClick={(data) => {
               console.log('Point clicked:', data)
-              // Could update map view to this date
+              // Update timeline to this date
+              setCurrentDate(new Date(data.date))
             }}
           />
         </div>
