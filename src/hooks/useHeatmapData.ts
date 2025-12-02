@@ -1,6 +1,5 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect } from 'react'
 import type { HeatmapDataPoint } from '../components/HeatmapLayer'
-import { apiService } from '../services/api'
 
 interface UseHeatmapDataOptions {
   date?: Date
@@ -52,7 +51,7 @@ export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
  * In production, this would fetch from backend API
  */
 function generateMockHeatmapData(
-  date?: Date,
+  _date?: Date,
   variable: 'temperature' | 'ndvi' | 'uhi' = 'temperature'
 ): HeatmapDataPoint[] {
   const data: HeatmapDataPoint[] = []

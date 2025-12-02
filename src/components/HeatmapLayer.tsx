@@ -1,5 +1,4 @@
 import { HeatmapLayer } from '@deck.gl/aggregation-layers'
-import type { Layer } from '@deck.gl/core'
 
 export interface HeatmapDataPoint {
   position: [number, number] // [longitude, latitude]
@@ -26,13 +25,13 @@ export function createHeatmapLayer(props: HeatmapLayerProps): HeatmapLayer | nul
     intensity = 1.0,
     threshold = 0.05,
     colorRange = [
-      [0, 0, 255, 0],      // Blue (cold)
-      [0, 255, 255, 128],  // Cyan
-      [0, 255, 0, 192],    // Green
-      [255, 255, 0, 255],  // Yellow
-      [255, 128, 0, 255],  // Orange
-      [255, 0, 0, 255]     // Red (hot)
-    ],
+      [0, 0, 255, 0] as const,      // Blue (cold)
+      [0, 255, 255, 128] as const,  // Cyan
+      [0, 255, 0, 192] as const,    // Green
+      [255, 255, 0, 255] as const,  // Yellow
+      [255, 128, 0, 255] as const,  // Orange
+      [255, 0, 0, 255] as const     // Red (hot)
+    ] as any, // Type assertion for Deck.gl color range
     visible = true,
     id = 'heatmap'
   } = props
