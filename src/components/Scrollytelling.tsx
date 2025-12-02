@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { useInView } from 'react-intersection-observer'
 import { motion, AnimatePresence } from 'framer-motion'
 
 export interface ScrollStep {
@@ -34,27 +33,47 @@ export default function Scrollytelling({
   const [currentStep, setCurrentStep] = useState(0)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  // Track which step is in view
-  const { ref: stepRef, inView } = useInView({
-    threshold: 0.5,
-    rootMargin: '-50% 0px -50% 0px'
-  })
+  // Track which step is in view - create refs for each step
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([])
 
   useEffect(() => {
-    if (inView && stepRef.current) {
-      const stepIndex = parseInt(stepRef.current.dataset.stepIndex || '0')
-      if (stepIndex !== currentStep) {
-        setCurrentStep(stepIndex)
-        const step = steps[stepIndex]
-        onStepChange?.(step, stepIndex)
-        
-        // Update map view if specified
-        if (step.mapViewState && onMapViewChange) {
-          onMapViewChange(step.mapViewState)
+    // Use IntersectionObserver to track all steps
+    const observers: IntersectionObserver[] = []
+    
+    stepRefs.current.forEach((element, index) => {
+      if (!element) return
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+              if (index !== currentStep) {
+                setCurrentStep(index)
+                const step = steps[index]
+                onStepChange?.(step, index)
+                
+                // Update map view if specified
+                if (step.mapViewState && onMapViewChange) {
+                  onMapViewChange(step.mapViewState)
+                }
+              }
+            }
+          })
+        },
+        {
+          threshold: 0.5,
+          rootMargin: '-50% 0px -50% 0px'
         }
-      }
+      )
+      
+      observer.observe(element)
+      observers.push(observer)
+    })
+    
+    return () => {
+      observers.forEach(observer => observer.disconnect())
     }
-  }, [inView, stepRef, currentStep, steps, onStepChange, onMapViewChange])
+  }, [currentStep, steps, onStepChange, onMapViewChange])
 
   return (
     <div ref={containerRef} className="relative w-full">
@@ -109,7 +128,9 @@ export default function Scrollytelling({
         {steps.map((step, index) => (
           <div
             key={step.id}
-            ref={index === currentStep ? stepRef : null}
+            ref={(el) => {
+              stepRefs.current[index] = el
+            }}
             data-step-index={index}
             className="min-h-screen flex items-center justify-center px-8 py-20"
             style={{ scrollSnapAlign: 'start' }}
