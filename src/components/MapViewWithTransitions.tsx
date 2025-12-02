@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Map from 'react-map-gl/maplibre'
 import DeckGL from '@deck.gl/react'
 import type { PickingInfo } from '@deck.gl/core'
@@ -60,14 +60,18 @@ export default function MapViewWithTransitions({
   const endDate = new Date('2021-12-31')
 
   // Update view state when animatedViewState changes (from scrollytelling)
-  useMemo(() => {
+  useEffect(() => {
     if (animatedViewState) {
       setViewState({
-        ...animatedViewState,
+        longitude: animatedViewState.longitude,
+        latitude: animatedViewState.latitude,
+        zoom: animatedViewState.zoom,
+        pitch: animatedViewState.pitch || 0,
+        bearing: animatedViewState.bearing || 0,
         transitionDuration,
         transitionInterpolator: new FlyToInterpolator(),
         transitionEasing: (t: number) => t * (2 - t) // Ease-in-out
-      })
+      } as any) // Type assertion needed for transition properties
       onViewStateChange?.(animatedViewState)
     }
   }, [animatedViewState, transitionDuration, onViewStateChange])
