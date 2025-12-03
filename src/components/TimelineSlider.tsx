@@ -97,8 +97,12 @@ export default function TimelineSlider({
         <button
           onClick={goToStart}
           disabled={disabled || sliderValue === 0}
-          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
-          style={{ minWidth: '48px', minHeight: '48px' }}
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-accent-green-dark"
+          style={{ 
+            minWidth: '48px', 
+            minHeight: '48px',
+            backgroundColor: disabled || sliderValue === 0 ? '#9ca3af' : '#10b981'
+          }}
           title="Go to start"
         >
           ⏮
@@ -108,8 +112,12 @@ export default function TimelineSlider({
         <button
           onClick={goToPrevious}
           disabled={disabled || sliderValue === 0}
-          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
-          style={{ minWidth: '48px', minHeight: '48px' }}
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-accent-green-dark"
+          style={{ 
+            minWidth: '48px', 
+            minHeight: '48px',
+            backgroundColor: disabled || sliderValue === 0 ? '#9ca3af' : '#10b981'
+          }}
           title="Previous"
         >
           ⏪
@@ -150,8 +158,12 @@ export default function TimelineSlider({
         <button
           onClick={goToNext}
           disabled={disabled || sliderValue >= totalSteps}
-          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
-          style={{ minWidth: '48px', minHeight: '48px' }}
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-accent-green-dark"
+          style={{ 
+            minWidth: '48px', 
+            minHeight: '48px',
+            backgroundColor: disabled || sliderValue >= totalSteps ? '#9ca3af' : '#10b981'
+          }}
           title="Next"
         >
           ⏩
@@ -161,8 +173,12 @@ export default function TimelineSlider({
         <button
           onClick={goToEnd}
           disabled={disabled || sliderValue >= totalSteps}
-          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
-          style={{ minWidth: '48px', minHeight: '48px' }}
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-400 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-accent-green-dark"
+          style={{ 
+            minWidth: '48px', 
+            minHeight: '48px',
+            backgroundColor: disabled || sliderValue >= totalSteps ? '#9ca3af' : '#10b981'
+          }}
           title="Go to end"
         >
           ⏭
@@ -181,10 +197,29 @@ export default function TimelineSlider({
             }}
             className={`px-4 py-2 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg border-2 ${
               step === s
-                ? 'bg-accent-green text-white border-white shadow-lg'
-                : 'bg-white text-text-primary border-accent-green hover:bg-accent-green-light hover:text-white'
+                ? 'bg-accent-green text-white border-accent-green-dark shadow-lg'
+                : 'bg-white text-accent-green-dark border-accent-green hover:bg-accent-green hover:text-white hover:border-accent-green-dark'
             }`}
-            style={{ minWidth: '70px' }}
+            style={{ 
+              minWidth: '70px',
+              backgroundColor: step === s ? '#10b981' : '#ffffff',
+              color: step === s ? '#ffffff' : '#059669',
+              borderColor: step === s ? '#059669' : '#10b981'
+            }}
+            onMouseEnter={(e) => {
+              if (step !== s) {
+                e.currentTarget.style.backgroundColor = '#10b981'
+                e.currentTarget.style.color = '#ffffff'
+                e.currentTarget.style.borderColor = '#059669'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (step !== s) {
+                e.currentTarget.style.backgroundColor = '#ffffff'
+                e.currentTarget.style.color = '#059669'
+                e.currentTarget.style.borderColor = '#10b981'
+              }
+            }}
           >
             {s.charAt(0).toUpperCase() + s.slice(1)}
           </button>
