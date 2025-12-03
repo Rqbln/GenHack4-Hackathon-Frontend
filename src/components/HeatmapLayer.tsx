@@ -21,16 +21,16 @@ export interface HeatmapLayerProps {
 export function createHeatmapLayer(props: HeatmapLayerProps): HeatmapLayer | null {
   const {
     data,
-    radiusPixels = 30,
-    intensity = 1.0,
-    threshold = 0.05,
+    radiusPixels = 50,
+    intensity = 1.5,
+    threshold = 0.03,
     colorRange = [
-      [0, 0, 255, 0] as const,      // Blue (cold)
-      [0, 255, 255, 128] as const,  // Cyan
-      [0, 255, 0, 192] as const,    // Green
-      [255, 255, 0, 255] as const,  // Yellow
-      [255, 128, 0, 255] as const,  // Orange
-      [255, 0, 0, 255] as const     // Red (hot)
+      [59, 76, 192, 0] as const,      // Dark blue (cold) - Viridis
+      [68, 104, 142, 100] as const,   // Blue
+      [53, 183, 121, 150] as const,   // Green
+      [110, 206, 88, 200] as const,   // Yellow-green
+      [253, 231, 37, 255] as const,   // Yellow (hot)
+      [255, 100, 50, 255] as const    // Orange-red (very hot)
     ] as any, // Type assertion for Deck.gl color range
     visible = true,
     id = 'heatmap'

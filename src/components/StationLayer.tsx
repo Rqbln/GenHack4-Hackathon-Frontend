@@ -24,17 +24,25 @@ export function createStationLayer(props: StationLayerProps): ScatterplotLayer |
     getPosition: (d: Station) => [d.longitude, d.latitude],
     getRadius: (d: Station) => {
       // Highlight selected station
-      return d.staid === selectedStationId ? 200 : 100
+      return d.staid === selectedStationId ? 300 : 150
     },
     getFillColor: (d: Station) => {
-      // Color based on selection
+      // Color based on selection - using green theme
       if (d.staid === selectedStationId) {
-        return [255, 255, 0, 255] // Yellow for selected
+        return [16, 185, 129, 255] // Green accent for selected
       }
-      return [255, 0, 0, 200] // Red for others
+      return [16, 185, 129, 200] // Light green for others
     },
-    radiusMinPixels: 5,
-    radiusMaxPixels: 20,
+    getStrokeColor: (d: Station) => {
+      if (d.staid === selectedStationId) {
+        return [255, 255, 255, 255] // White border for selected
+      }
+      return [255, 255, 255, 150] // Light white border
+    },
+    radiusMinPixels: 8,
+    radiusMaxPixels: 25,
+    stroked: true,
+    lineWidthMinPixels: 2,
     radiusScale: 1,
     pickable: true,
     onClick: (info) => {

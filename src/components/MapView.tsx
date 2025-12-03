@@ -254,7 +254,13 @@ export default function MapView() {
       <BackendConnectionStatus />
 
       {/* Demo Mode */}
-      <DemoMode onToggle={setDemoMode} />
+      <DemoMode 
+        onToggle={setDemoMode}
+        onStartTour={() => {
+          // Tour functionality can be added here
+          console.log('Starting demo tour...')
+        }}
+      />
 
       {/* Info overlay with glassmorphism */}
       <div className="absolute top-4 left-4 glass-dark p-4 rounded-lg shadow-lg max-w-sm fade-in">
@@ -273,7 +279,7 @@ export default function MapView() {
       </div>
 
       {/* Timeline Slider with glassmorphism */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom">
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom z-50">
         <div className="glass-dark rounded-lg p-4">
           <TimelineSlider
             startDate={startDate}
@@ -291,7 +297,20 @@ export default function MapView() {
 
       {/* Time Series Chart Panel with glassmorphism */}
       {selectedStation && stationData.length > 0 && (
-        <div className="absolute bottom-24 left-4 right-4 glass-dark p-4 rounded-lg shadow-xl max-w-4xl scale-in">
+        <div className="absolute bottom-24 left-4 right-4 glass-dark p-4 rounded-lg shadow-xl max-w-4xl scale-in z-40">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-lg font-bold text-text-primary">{selectedStation.staname} - Time Series</h3>
+            <button
+              onClick={() => {
+                setSelectedStation(null)
+                setStationData([])
+              }}
+              className="text-text-secondary hover:text-text-primary font-bold text-xl leading-none px-2 py-1 rounded hover:bg-bg-tertiary transition-colors"
+              aria-label="Close chart"
+            >
+              ×
+            </button>
+          </div>
           <TimeSeriesChart
             data={stationData}
             stationName={selectedStation.staname}
