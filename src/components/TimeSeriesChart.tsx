@@ -35,11 +35,12 @@ export default function TimeSeriesChart({ data, stationName, onPointClick }: Tim
   }
 
   return (
-    <div className="w-full h-64 bg-bg-secondary rounded-lg p-4 border border-border-primary" style={{ minWidth: 0, minHeight: 256 }}>
+    <div className="w-full h-64 bg-bg-secondary rounded-lg p-4 border border-border-primary overflow-hidden" style={{ minWidth: 0, minHeight: 256 }}>
       {stationName && (
         <h3 className="text-lg font-semibold mb-2 text-text-primary">{stationName}</h3>
       )}
-      <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
+      <div className="w-full h-[calc(100%-3rem)]">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={200}>
         <LineChart
           data={chartData}
           onClick={handleClick}
@@ -80,6 +81,7 @@ export default function TimeSeriesChart({ data, stationName, onPointClick }: Tim
           />
         </LineChart>
       </ResponsiveContainer>
+      </div>
     </div>
   )
 }

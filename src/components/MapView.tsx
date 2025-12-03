@@ -259,17 +259,17 @@ export default function MapView() {
         />
       )}
       
-      {/* Backend Connection Status */}
-      <BackendConnectionStatus />
-
-      {/* Demo Mode */}
-      <DemoMode 
-        onToggle={setDemoMode}
-        onStartTour={() => {
-          // Tour functionality can be added here
-          console.log('Starting demo tour...')
-        }}
-      />
+      {/* Backend Connection Status and Demo Mode */}
+      <div className="absolute top-4 right-4 flex flex-col gap-2 z-[70]">
+        <BackendConnectionStatus />
+        <DemoMode 
+          onToggle={setDemoMode}
+          onStartTour={() => {
+            // Tour functionality can be added here
+            console.log('Starting demo tour...')
+          }}
+        />
+      </div>
 
       {/* Info overlay with glassmorphism - Draggable */}
       <DraggablePanel

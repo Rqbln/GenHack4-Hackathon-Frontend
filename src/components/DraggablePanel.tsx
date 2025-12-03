@@ -140,7 +140,7 @@ export default function DraggablePanel({
       )}
       
       {/* Content */}
-      <div className="p-4 overflow-auto" style={{ maxHeight: 'calc(90vh - 60px)' }}>
+      <div className="p-4 overflow-hidden" style={{ maxHeight: 'calc(90vh - 60px)' }}>
         {children}
       </div>
     </div>

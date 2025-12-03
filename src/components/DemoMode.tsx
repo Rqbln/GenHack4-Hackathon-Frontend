@@ -47,7 +47,7 @@ export default function DemoMode({ onToggle, onStartTour }: DemoModeProps) {
     return (
       <button
         onClick={handleToggle}
-        className="absolute bottom-20 right-4 bg-accent-green hover:bg-accent-green-dark text-white px-4 py-2 rounded-lg shadow-lg font-semibold z-50 pulse-glow hover-lift transition-smooth border-2 border-white"
+        className="bg-accent-green hover:bg-accent-green-dark text-white px-4 py-2 rounded-lg shadow-lg font-semibold pulse-glow hover-lift transition-smooth border-2 border-white"
         style={{ 
           backgroundColor: '#10b981',
           color: '#ffffff',
@@ -61,7 +61,7 @@ export default function DemoMode({ onToggle, onStartTour }: DemoModeProps) {
   }
 
   return (
-    <div className="absolute bottom-20 right-4 glass-dark p-4 rounded-lg shadow-xl border-2 border-accent-green z-50 max-w-sm scale-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)' }}>
+    <div className="glass-dark p-4 rounded-lg shadow-xl border-2 border-accent-green max-w-sm scale-in" style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', maxHeight: 'calc(100vh - 200px)', overflowY: 'auto' }}>
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-lg font-bold text-text-primary">🎬 Demo Mode Active</h3>
         <button
