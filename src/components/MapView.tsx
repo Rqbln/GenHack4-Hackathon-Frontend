@@ -8,6 +8,7 @@ import TimeSeriesChart from './TimeSeriesChart'
 import TimelineSlider from './TimelineSlider'
 import BackendConnectionStatus from './BackendConnectionStatus'
 import DemoMode from './DemoMode'
+import DraggablePanel from './DraggablePanel'
 import { createHeatmapLayer } from './HeatmapLayer'
 import { useAsyncLayer } from '../hooks/useAsyncLayer'
 import { useHeatmapData } from '../hooks/useHeatmapData'
@@ -62,6 +63,8 @@ export default function MapView() {
   const [stationData, setStationData] = useState<StationData[]>([])
   const [currentDate, setCurrentDate] = useState(new Date('2020-01-01'))
   const [_demoMode, setDemoMode] = useState(false)
+  const [chartMinimized, setChartMinimized] = useState(false)
+  const [infoMinimized, setInfoMinimized] = useState(false)
   
   // Fetch stations from API
   const { stations: apiStations, loading: stationsLoading } = useStations()
@@ -268,25 +271,33 @@ export default function MapView() {
         }}
       />
 
-      {/* Info overlay with glassmorphism */}
-      <div className="absolute top-4 left-4 glass-dark p-4 rounded-lg shadow-lg max-w-sm fade-in">
-        <h1 className="text-xl font-bold mb-2 text-text-primary">GenHack 2025 - Climate Heat Dashboard</h1>
-        <p className="text-sm text-text-secondary mb-2">
-          {stationsLoading ? 'Loading stations...' : `${stations.length} weather stations loaded`}
-          {apiStations.length > 0 && <span className="text-accent-green ml-2">(from API)</span>}
-        </p>
-        {selectedStation && (
-          <div className="mt-2 pt-2 border-t border-border-primary">
-            <p className="text-xs text-accent-green-dark mb-2">
-              Selected: {selectedStation.staname}
-            </p>
-          </div>
-        )}
-      </div>
+      {/* Info overlay with glassmorphism - Draggable */}
+      <DraggablePanel
+        title="GenHack 2025 - Climate Heat Dashboard"
+        initialPosition={{ x: 16, y: 16 }}
+        onMinimize={() => setInfoMinimized(!infoMinimized)}
+        minimized={infoMinimized}
+        zIndex={60}
+        className="max-w-sm"
+      >
+        <div className="space-y-2">
+          <p className="text-sm text-text-secondary">
+            {stationsLoading ? 'Loading stations...' : `${stations.length} weather stations loaded`}
+            {apiStations.length > 0 && <span className="text-accent-green ml-2">(from API)</span>}
+          </p>
+          {selectedStation && (
+            <div className="pt-2 border-t border-border-primary">
+              <p className="text-xs text-accent-green-dark">
+                Selected: {selectedStation.staname}
+              </p>
+            </div>
+          )}
+        </div>
+      </DraggablePanel>
 
-      {/* Timeline Slider with glassmorphism */}
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom z-50">
-        <div className="glass-dark rounded-lg p-4">
+      {/* Timeline Slider with glassmorphism - Fixed at bottom */}
+      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-4xl px-4 slide-in-bottom z-[100] pointer-events-none">
+        <div className="glass-dark rounded-lg p-4 pointer-events-auto">
           <TimelineSlider
             startDate={startDate}
             endDate={endDate}
@@ -301,22 +312,20 @@ export default function MapView() {
         </div>
       </div>
 
-      {/* Time Series Chart Panel with glassmorphism */}
+      {/* Time Series Chart Panel with glassmorphism - Draggable */}
       {selectedStation && stationData.length > 0 && (
-        <div className="absolute bottom-24 left-4 right-4 glass-dark p-4 rounded-lg shadow-xl max-w-4xl scale-in z-40">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-lg font-bold text-text-primary">{selectedStation.staname} - Time Series</h3>
-            <button
-              onClick={() => {
-                setSelectedStation(null)
-                setStationData([])
-              }}
-              className="text-text-secondary hover:text-text-primary font-bold text-xl leading-none px-2 py-1 rounded hover:bg-bg-tertiary transition-colors"
-              aria-label="Close chart"
-            >
-              ×
-            </button>
-          </div>
+        <DraggablePanel
+          title={`${selectedStation.staname} - Time Series`}
+          initialPosition={{ x: 16, y: 200 }}
+          onClose={() => {
+            setSelectedStation(null)
+            setStationData([])
+          }}
+          onMinimize={() => setChartMinimized(!chartMinimized)}
+          minimized={chartMinimized}
+          zIndex={50}
+          className="max-w-4xl w-[600px]"
+        >
           <TimeSeriesChart
             data={stationData}
             stationName={selectedStation.staname}
@@ -326,7 +335,7 @@ export default function MapView() {
               setCurrentDate(new Date(data.date))
             }}
           />
-        </div>
+        </DraggablePanel>
       )}
     </div>
   )
