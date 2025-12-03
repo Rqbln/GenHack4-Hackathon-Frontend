@@ -1,12 +1,10 @@
-/* Import custom animations - must be before @tailwind */
+@import "tailwindcss";
+
+/* Import custom animations */
 @import './styles/animations.css';
 
-/* Import design system - must be before @tailwind */
+/* Import design system */
 @import './styles/design-system.css';
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Light theme with light green */
 :root {
