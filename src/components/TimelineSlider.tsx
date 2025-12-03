@@ -97,7 +97,8 @@ export default function TimelineSlider({
         <button
           onClick={goToStart}
           disabled={disabled || sliderValue === 0}
-          className="px-3 py-1 text-sm bg-bg-tertiary hover:bg-accent-green-light disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-text-primary"
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
+          style={{ minWidth: '48px', minHeight: '48px' }}
           title="Go to start"
         >
           ⏮
@@ -107,7 +108,8 @@ export default function TimelineSlider({
         <button
           onClick={goToPrevious}
           disabled={disabled || sliderValue === 0}
-          className="px-3 py-1 text-sm bg-bg-tertiary hover:bg-accent-green-light disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-text-primary"
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
+          style={{ minWidth: '48px', minHeight: '48px' }}
           title="Previous"
         >
           ⏪
@@ -148,7 +150,8 @@ export default function TimelineSlider({
         <button
           onClick={goToNext}
           disabled={disabled || sliderValue >= totalSteps}
-          className="px-3 py-1 text-sm bg-bg-tertiary hover:bg-accent-green-light disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-text-primary"
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
+          style={{ minWidth: '48px', minHeight: '48px' }}
           title="Next"
         >
           ⏩
@@ -158,7 +161,8 @@ export default function TimelineSlider({
         <button
           onClick={goToEnd}
           disabled={disabled || sliderValue >= totalSteps}
-          className="px-3 py-1 text-sm bg-bg-tertiary hover:bg-accent-green-light disabled:opacity-50 disabled:cursor-not-allowed rounded transition-colors text-text-primary"
+          className="px-4 py-2 text-lg font-bold bg-accent-green hover:bg-accent-green-dark disabled:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed rounded-lg transition-all text-white shadow-md hover:shadow-lg disabled:shadow-none border-2 border-white"
+          style={{ minWidth: '48px', minHeight: '48px' }}
           title="Go to end"
         >
           ⏭
@@ -166,8 +170,8 @@ export default function TimelineSlider({
       </div>
 
       {/* Step selector */}
-      <div className="mt-3 flex justify-center gap-2">
-        <span className="text-xs text-text-secondary">Step:</span>
+      <div className="mt-4 flex items-center justify-center gap-3">
+        <span className="text-sm font-semibold text-text-primary">Step:</span>
         {(['day', 'week', 'month', 'quarter'] as const).map((s) => (
           <button
             key={s}
@@ -175,13 +179,14 @@ export default function TimelineSlider({
               // This would need to be handled by parent component
               // For now, just visual
             }}
-            className={`px-2 py-1 text-xs rounded ${
+            className={`px-4 py-2 text-sm font-bold rounded-lg transition-all shadow-md hover:shadow-lg border-2 ${
               step === s
-                ? 'bg-accent-green text-white'
-                : 'bg-bg-tertiary text-text-secondary hover:bg-accent-green-light'
+                ? 'bg-accent-green text-white border-white shadow-lg'
+                : 'bg-white text-text-primary border-accent-green hover:bg-accent-green-light hover:text-white'
             }`}
+            style={{ minWidth: '70px' }}
           >
-            {s}
+            {s.charAt(0).toUpperCase() + s.slice(1)}
           </button>
         ))}
       </div>
