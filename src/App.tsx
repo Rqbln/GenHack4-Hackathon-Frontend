@@ -3,7 +3,7 @@ import './App.css'
 
 function App() {
   return (
-    <div className="w-full h-screen bg-gray-900 text-white">
+    <div className="w-full h-screen bg-bg-primary text-text-primary">
       <MapView />
     </div>
   )

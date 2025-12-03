@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Map from 'react-map-gl/maplibre'
 import DeckGL from '@deck.gl/react'
 import type { PickingInfo } from '@deck.gl/core'
@@ -11,10 +11,12 @@ import DemoMode from './DemoMode'
 import { createHeatmapLayer } from './HeatmapLayer'
 import { useAsyncLayer } from '../hooks/useAsyncLayer'
 import { useHeatmapData } from '../hooks/useHeatmapData'
+import { useStations } from '../hooks/useStations'
+import { waitForWebGL } from '../utils/webglCheck'
 import type { Station, StationData } from '../types/station'
 
-// MapLibre style URL (dark theme)
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+// MapLibre style URL (light theme)
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json'
 
 const INITIAL_VIEW_STATE = {
   longitude: 2.3522, // Paris
@@ -60,13 +62,22 @@ export default function MapView() {
   const [stationData, setStationData] = useState<StationData[]>([])
   const [currentDate, setCurrentDate] = useState(new Date('2020-01-01'))
   const [_demoMode, setDemoMode] = useState(false)
+  
+  // Fetch stations from API
+  const { stations: apiStations, loading: stationsLoading } = useStations()
+  
+  // Use API stations if available, otherwise fallback to mock
+  // Memoize to prevent unnecessary re-renders
+  const stations = useMemo(() => {
+    return apiStations.length > 0 ? apiStations : MOCK_STATIONS
+  }, [apiStations])
 
   // Timeline dates
   const startDate = new Date('2020-01-01')
   const endDate = new Date('2021-12-31')
 
   // Mock time series data (will be replaced with real ECA&D data)
-  const loadStationData = (station: Station) => {
+  const loadStationData = useCallback((station: Station) => {
     // Generate mock time series data
     const mockData: StationData[] = []
     const startDate = new Date('2020-01-01')
@@ -81,12 +92,20 @@ export default function MapView() {
       })
     }
     setStationData(mockData)
-  }
+  }, [])
+
+  // Memoize stations array to prevent unnecessary re-renders
+  const stationsKey = useMemo(() => {
+    return stations.map(s => s.staid).join(',')
+  }, [stations])
 
   // Create station layer with async loading for performance
   const createStationLayerAsync = useCallback(() => {
+    if (!stations || stations.length === 0) {
+      return null
+    }
     return createStationLayer({
-      stations: MOCK_STATIONS,
+      stations: stations,
       selectedStationId: selectedStation?.staid,
       onStationClick: (station) => {
         setSelectedStation(station)
@@ -95,13 +114,13 @@ export default function MapView() {
       },
       visible: true
     })
-  }, [selectedStation])
+  }, [selectedStation?.staid, stationsKey, loadStationData])
 
   const [stationLayer, _stationLoading, _stationError] = useAsyncLayer(
     createStationLayerAsync,
-    [selectedStation],
+    [selectedStation?.staid, stationsKey],
     {
-      enabled: true,
+      enabled: stations.length > 0,
       onError: (error) => {
         console.error('Failed to load station layer:', error)
       }
@@ -140,6 +159,60 @@ export default function MapView() {
     }
   }
 
+  // Check WebGL support before rendering DeckGL
+  const [webglReady, setWebglReady] = useState(false)
+  const [webglError, setWebglError] = useState<string | null>(null)
+  
+  useEffect(() => {
+    let mounted = true
+    
+    const initWebGL = async () => {
+      // Wait a bit for DOM to be ready
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      if (!mounted) return
+      
+      const result = await waitForWebGL(2000)
+      
+      if (!mounted) return
+      
+      if (result.supported) {
+        setWebglReady(true)
+      } else {
+        setWebglError(result.error || 'WebGL not available')
+      }
+    }
+    
+    initWebGL()
+    
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  if (webglError) {
+    return (
+      <div className="relative w-full h-full flex items-center justify-center bg-bg-primary">
+        <div className="text-center p-8 glass-dark rounded-lg">
+          <h2 className="text-xl font-bold text-text-primary mb-2">WebGL Error</h2>
+          <p className="text-text-secondary mb-4">{webglError}</p>
+          <p className="text-sm text-text-secondary">Please refresh the page or use a browser that supports WebGL.</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!webglReady) {
+    return (
+      <div className="relative w-full h-full flex items-center justify-center bg-bg-primary">
+        <div className="text-center p-8 glass-dark rounded-lg">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent-green mx-auto mb-4"></div>
+          <p className="text-text-secondary">Initializing WebGL...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="relative w-full h-full">
       <DeckGL
@@ -152,10 +225,19 @@ export default function MapView() {
         controller={true}
         layers={layers}
         onHover={handleHover}
+        onError={(error) => {
+          console.error('DeckGL error:', error)
+          if (error.message?.includes('WebGL') || error.message?.includes('maxTextureDimension2D')) {
+            setWebglError('WebGL context error. Please refresh the page.')
+          }
+        }}
       >
         <Map
           mapStyle={MAP_STYLE}
           reuseMaps
+          onError={(error) => {
+            console.error('Map error:', error)
+          }}
         />
       </DeckGL>
       
@@ -176,13 +258,14 @@ export default function MapView() {
 
       {/* Info overlay with glassmorphism */}
       <div className="absolute top-4 left-4 glass-dark p-4 rounded-lg shadow-lg max-w-sm fade-in">
-        <h1 className="text-xl font-bold mb-2">GenHack 2025 - Climate Heat Dashboard</h1>
-        <p className="text-sm text-gray-300 mb-2">
-          {MOCK_STATIONS.length} weather stations loaded
+        <h1 className="text-xl font-bold mb-2 text-text-primary">GenHack 2025 - Climate Heat Dashboard</h1>
+        <p className="text-sm text-text-secondary mb-2">
+          {stationsLoading ? 'Loading stations...' : `${stations.length} weather stations loaded`}
+          {apiStations.length > 0 && <span className="text-accent-green ml-2">(from API)</span>}
         </p>
         {selectedStation && (
-          <div className="mt-2 pt-2 border-t border-gray-600">
-            <p className="text-xs text-yellow-400 mb-2">
+          <div className="mt-2 pt-2 border-t border-border-primary">
+            <p className="text-xs text-accent-green-dark mb-2">
               Selected: {selectedStation.staname}
             </p>
           </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { Layer } from '@deck.gl/core'
 
 interface UseAsyncLayerOptions {
@@ -20,6 +20,18 @@ export function useAsyncLayer<T extends Layer>(
   const [layer, setLayer] = useState<T | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
+  
+  // Use ref to store the latest factory function without causing re-renders
+  const factoryRef = useRef(layerFactory)
+  const onLoadRef = useRef(onLoad)
+  const onErrorRef = useRef(onError)
+  
+  // Update refs when they change
+  useEffect(() => {
+    factoryRef.current = layerFactory
+    onLoadRef.current = onLoad
+    onErrorRef.current = onError
+  }, [layerFactory, onLoad, onError])
 
   const loadLayer = useCallback(async () => {
     if (!enabled) {
@@ -46,18 +58,18 @@ export function useAsyncLayer<T extends Layer>(
         })
       })
 
-      const result = await layerFactory()
+      const result = await factoryRef.current()
       setLayer(result)
-      onLoad?.(result)
+      onLoadRef.current?.(result)
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err))
       setError(error)
-      onError?.(error)
+      onErrorRef.current?.(error)
       setLayer(null)
     } finally {
       setLoading(false)
     }
-  }, [enabled, layerFactory, onLoad, onError, ...deps])
+  }, [enabled, ...deps])
 
   useEffect(() => {
     loadLayer()

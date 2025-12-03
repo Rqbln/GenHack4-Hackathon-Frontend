@@ -35,14 +35,17 @@ export default {
         'ndvi-sparse': '#FFFF00',    // Yellow
         'ndvi-dense': '#00FF00',     // Green
         
-        // UI Colors (Dark theme)
-        'bg-primary': '#0a0a0a',
-        'bg-secondary': '#1a1a1a',
-        'bg-tertiary': '#2a2a2a',
-        'text-primary': '#ffffff',
-        'text-secondary': '#a0a0a0',
-        'border-primary': '#333333',
-        'border-secondary': '#444444',
+        // UI Colors (Light theme with green)
+        'bg-primary': '#f5fdf9',
+        'bg-secondary': '#ffffff',
+        'bg-tertiary': '#e8f5f0',
+        'text-primary': '#1a1a1a',
+        'text-secondary': '#4a5568',
+        'accent-green': '#10b981',
+        'accent-green-light': '#6ee7b7',
+        'accent-green-dark': '#059669',
+        'border-primary': '#d1fae5',
+        'border-secondary': '#a7f3d0',
       },
       fontFamily: {
         'sans': ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'sans-serif'],

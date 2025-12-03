@@ -36,7 +36,7 @@ export default function BackendConnectionStatus({
 
   if (checking) {
     return (
-      <div className="absolute top-4 right-4 bg-gray-800 bg-opacity-90 px-3 py-2 rounded-lg text-xs text-gray-400">
+      <div className="absolute top-4 right-4 glass-dark px-3 py-2 rounded-lg text-xs text-text-secondary">
         🔄 Checking backend...
       </div>
     )
@@ -46,8 +46,8 @@ export default function BackendConnectionStatus({
     <div
       className={`absolute top-4 right-4 glass-dark px-3 py-2 rounded-lg text-xs font-semibold fade-in hover-lift ${
         connected
-          ? 'bg-green-900 bg-opacity-90 text-green-300'
-          : 'bg-red-900 bg-opacity-90 text-red-300'
+          ? 'bg-accent-green-light text-accent-green-dark border border-accent-green'
+          : 'bg-red-100 text-red-700 border border-red-300'
       }`}
       title={connected ? 'Backend connected' : 'Backend disconnected'}
     >

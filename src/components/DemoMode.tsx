@@ -21,7 +21,7 @@ export default function DemoMode({ onToggle }: DemoModeProps) {
     return (
       <button
         onClick={handleToggle}
-        className="absolute bottom-20 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg shadow-lg font-semibold z-50 pulse-glow hover-lift transition-smooth"
+        className="absolute bottom-20 right-4 bg-accent-green hover:bg-accent-green-dark text-white px-4 py-2 rounded-lg shadow-lg font-semibold z-50 pulse-glow hover-lift transition-smooth"
         title="Enable demo mode for video capture"
       >
         🎬 Demo Mode
@@ -30,42 +30,42 @@ export default function DemoMode({ onToggle }: DemoModeProps) {
   }
 
   return (
-    <div className="absolute bottom-20 right-4 glass-dark p-4 rounded-lg shadow-xl border border-blue-500 z-50 max-w-sm scale-in">
+    <div className="absolute bottom-20 right-4 glass-dark p-4 rounded-lg shadow-xl border border-accent-green z-50 max-w-sm scale-in">
       <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-bold text-white">🎬 Demo Mode Active</h3>
+        <h3 className="text-lg font-bold text-text-primary">🎬 Demo Mode Active</h3>
         <button
           onClick={handleToggle}
-          className="text-gray-400 hover:text-white"
+          className="text-text-secondary hover:text-text-primary"
         >
           ✕
         </button>
       </div>
       
-      <div className="space-y-2 text-sm text-gray-300">
+      <div className="space-y-2 text-sm text-text-secondary">
         <div className="flex items-center gap-2">
-          <span className="text-green-400">✓</span>
+          <span className="text-accent-green">✓</span>
           <span>Interactive map with Deck.gl</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-green-400">✓</span>
+          <span className="text-accent-green">✓</span>
           <span>Weather stations visualization</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-green-400">✓</span>
+          <span className="text-accent-green">✓</span>
           <span>Time series charts</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-green-400">✓</span>
+          <span className="text-accent-green">✓</span>
           <span>Temporal navigation slider</span>
         </div>
         <div className="flex items-center gap-2">
-          <span className="text-green-400">✓</span>
+          <span className="text-accent-green">✓</span>
           <span>Backend API integration</span>
         </div>
       </div>
 
-      <div className="mt-4 pt-3 border-t border-gray-700">
-        <p className="text-xs text-gray-400">
+      <div className="mt-4 pt-3 border-t border-border-primary">
+        <p className="text-xs text-text-secondary">
           💡 <strong>Tip:</strong> Use this mode to showcase all MVP features in your demo video.
         </p>
       </div>

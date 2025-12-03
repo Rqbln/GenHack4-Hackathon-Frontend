@@ -1,19 +1,24 @@
+/* Import custom animations - must be before @tailwind */
+@import './styles/animations.css';
+
+/* Import design system - must be before @tailwind */
+@import './styles/design-system.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Import custom animations */
-@import './styles/animations.css';
-
-/* Import design system */
-@import './styles/design-system.css';
-
-/* Dark mode base */
+/* Light theme with light green */
 :root {
-  --bg-primary: #0a0a0a;
-  --bg-secondary: #1a1a1a;
-  --text-primary: #ffffff;
-  --text-secondary: #a0a0a0;
+  --bg-primary: #f5fdf9;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #e8f5f0;
+  --text-primary: #1a1a1a;
+  --text-secondary: #4a5568;
+  --accent-green: #10b981;
+  --accent-green-light: #6ee7b7;
+  --accent-green-dark: #059669;
+  --border-color: #d1fae5;
 }
 
 body {
@@ -33,21 +38,21 @@ body {
   overflow: hidden;
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar for light theme */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: var(--bg-tertiary);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #444;
+  background: var(--accent-green);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: var(--accent-green-dark);
 }

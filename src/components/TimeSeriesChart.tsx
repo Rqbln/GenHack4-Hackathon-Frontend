@@ -28,16 +28,16 @@ export default function TimeSeriesChart({ data, stationName, onPointClick }: Tim
 
   if (chartData.length === 0) {
     return (
-      <div className="w-full h-64 flex items-center justify-center bg-gray-800 rounded-lg">
-        <p className="text-gray-400">No data available</p>
+      <div className="w-full h-64 flex items-center justify-center bg-bg-secondary rounded-lg border border-border-primary">
+        <p className="text-text-secondary">No data available</p>
       </div>
     )
   }
 
   return (
-    <div className="w-full h-64 bg-gray-800 rounded-lg p-4">
+    <div className="w-full h-64 bg-bg-secondary rounded-lg p-4 border border-border-primary">
       {stationName && (
-        <h3 className="text-lg font-semibold mb-2 text-white">{stationName}</h3>
+        <h3 className="text-lg font-semibold mb-2 text-text-primary">{stationName}</h3>
       )}
       <ResponsiveContainer width="100%" height="100%">
         <LineChart
@@ -45,36 +45,36 @@ export default function TimeSeriesChart({ data, stationName, onPointClick }: Tim
           onClick={handleClick}
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" stroke="#444" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#d1fae5" />
           <XAxis
             dataKey="date"
-            stroke="#999"
+            stroke="#4a5568"
             style={{ fontSize: '12px' }}
             angle={-45}
             textAnchor="end"
             height={60}
           />
           <YAxis
-            label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', style: { fill: '#999' } }}
-            stroke="#999"
+            label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft', style: { fill: '#4a5568' } }}
+            stroke="#4a5568"
             style={{ fontSize: '12px' }}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: '#1a1a1a',
-              border: '1px solid #444',
+              backgroundColor: '#ffffff',
+              border: '1px solid #10b981',
               borderRadius: '4px',
-              color: '#fff'
+              color: '#1a1a1a'
             }}
-            labelStyle={{ color: '#fff' }}
+            labelStyle={{ color: '#1a1a1a' }}
           />
-          <Legend wrapperStyle={{ color: '#fff' }} />
+          <Legend wrapperStyle={{ color: '#1a1a1a' }} />
           <Line
             type="monotone"
             dataKey="temperature"
-            stroke="#ff4444"
+            stroke="#10b981"
             strokeWidth={2}
-            dot={{ r: 3, fill: '#ff4444' }}
+            dot={{ r: 3, fill: '#10b981' }}
             activeDot={{ r: 6 }}
             name="Temperature (°C)"
           />

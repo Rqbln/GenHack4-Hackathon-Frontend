@@ -49,7 +49,9 @@ class ApiService {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      return await response.json()
+      const data = await response.json()
+      // Handle both {stations: [...]} and [...] formats
+      return Array.isArray(data) ? data : (data.stations || [])
     } catch (error) {
       console.error('Failed to fetch stations:', error)
       throw error
