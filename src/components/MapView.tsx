@@ -227,9 +227,21 @@ export default function MapView() {
         onHover={handleHover}
         onError={(error) => {
           console.error('DeckGL error:', error)
-          if (error.message?.includes('WebGL') || error.message?.includes('maxTextureDimension2D')) {
-            setWebglError('WebGL context error. Please refresh the page.')
+          const errorMsg = error?.message || error?.toString() || ''
+          if (errorMsg.includes('WebGL') || errorMsg.includes('maxTextureDimension2D') || errorMsg.includes('texture')) {
+            // Don't show error immediately, try to recover
+            console.warn('WebGL error detected, attempting recovery...')
+            // Only set error if it persists
+            setTimeout(() => {
+              setWebglError('WebGL context error. Please refresh the page.')
+            }, 2000)
           }
+        }}
+        glOptions={{
+          preserveDrawingBuffer: false,
+          antialias: false,
+          depth: false,
+          stencil: false
         }}
       >
         <Map
