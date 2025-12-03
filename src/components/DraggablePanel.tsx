@@ -41,33 +41,31 @@ export default function DraggablePanel({
     }
   }
 
-  const handleMouseMove = (e: MouseEvent) => {
-    if (isDragging) {
+  // Add global event listeners for dragging
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
       setPosition({
         x: e.clientX - dragOffset.x,
         y: e.clientY - dragOffset.y
       })
     }
-  }
 
-  const handleMouseUp = () => {
-    setIsDragging(false)
-  }
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
 
-  // Add global event listeners for dragging
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove)
-      document.addEventListener('mouseup', handleMouseUp)
-      document.body.style.cursor = 'grabbing'
-      document.body.style.userSelect = 'none'
-      
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove)
-        document.removeEventListener('mouseup', handleMouseUp)
-        document.body.style.cursor = ''
-        document.body.style.userSelect = ''
-      }
+    document.addEventListener('mousemove', handleMouseMove)
+    document.addEventListener('mouseup', handleMouseUp)
+    document.body.style.cursor = 'grabbing'
+    document.body.style.userSelect = 'none'
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove)
+      document.removeEventListener('mouseup', handleMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
     }
   }, [isDragging, dragOffset])
 
@@ -148,4 +146,3 @@ export default function DraggablePanel({
     </div>
   )
 }
-
