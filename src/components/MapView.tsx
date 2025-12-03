@@ -237,12 +237,6 @@ export default function MapView() {
             }, 2000)
           }
         }}
-        glOptions={{
-          preserveDrawingBuffer: false,
-          antialias: false,
-          depth: false,
-          stencil: false
-        }}
       >
         <Map
           mapStyle={MAP_STYLE}
