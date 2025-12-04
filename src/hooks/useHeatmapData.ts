@@ -2,12 +2,6 @@ import { useState, useEffect } from 'react'
 import type { HeatmapDataPoint } from '../components/HeatmapLayer'
 import { apiService } from '../services/api'
 
-// Expose baseUrl for direct fetch (workaround)
-declare module '../services/api' {
-  interface ApiService {
-    baseUrl: string
-  }
-}
 
 interface UseHeatmapDataOptions {
   date?: Date
@@ -43,33 +37,16 @@ export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
           
           try {
             // Try to fetch heatmap data from API
-            const bboxStr = bbox.join(',')
-            const url = `${apiService['baseUrl']}/api/heatmap?date=${dateStr}&bbox=${bboxStr}`
-            const response = await fetch(url)
+            const heatmapData = await apiService.getHeatmapData(dateStr, bbox)
             
-            if (response.ok) {
-              const result = await response.json()
-              if (result && result.data && Array.isArray(result.data)) {
-                const heatmapPoints: HeatmapDataPoint[] = result.data.map((point: any) => ({
-                  position: point.position || [point.lon || point.longitude, point.lat || point.latitude],
-                  weight: point.weight || point.temperature || 0
-                }))
-                setData(heatmapPoints)
-              } else {
-                setData([])
-              }
+            if (heatmapData && heatmapData.data && Array.isArray(heatmapData.data)) {
+              const heatmapPoints: HeatmapDataPoint[] = heatmapData.data.map((point: any) => ({
+                position: point.position || [point.lon || point.longitude, point.lat || point.latitude],
+                weight: point.weight || point.temperature || 0
+              }))
+              setData(heatmapPoints)
             } else {
-              // Fallback to ERA5 endpoint
-              const era5Data = await apiService.getERA5Data(bbox, dateStr, dateStr, ['t2m'])
-              if (era5Data && era5Data.data && Array.isArray(era5Data.data)) {
-                const heatmapPoints: HeatmapDataPoint[] = era5Data.data.map((point: any) => ({
-                  position: [point.longitude || point.lon, point.latitude || point.lat],
-                  weight: point.temperature || point.t2m || 0
-                }))
-                setData(heatmapPoints)
-              } else {
-                setData([])
-              }
+              setData([])
             }
           } catch (apiError) {
             console.warn('Heatmap API endpoint not available:', apiError)
