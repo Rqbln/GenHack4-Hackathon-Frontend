@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { HeatmapDataPoint } from '../components/HeatmapLayer'
+import { apiService } from '../services/api'
 
 interface UseHeatmapDataOptions {
   date?: Date
@@ -8,7 +9,8 @@ interface UseHeatmapDataOptions {
 }
 
 /**
- * Hook to fetch and prepare heatmap data from backend
+ * Hook to fetch and prepare heatmap data from backend API
+ * Returns empty data if API endpoint is not available
  */
 export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
   const { date, variable = 'temperature', enabled = true } = options
@@ -27,10 +29,37 @@ export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
       setError(null)
 
       try {
-        // For now, generate mock data
-        // In production, this would call the backend API
-        const mockData: HeatmapDataPoint[] = generateMockHeatmapData(date, variable)
-        setData(mockData)
+        // Try to fetch heatmap data from API
+        // For now, the API doesn't have a heatmap endpoint yet
+        // So we return empty data instead of generating mock data
+        // TODO: Implement /api/heatmap endpoint in backend
+        const dateStr = date ? date.toISOString().split('T')[0] : '2020-01-01'
+        
+        // Paris bounding box
+        const bbox: [number, number, number, number] = [2.2, 48.8, 2.5, 49.0]
+        const startDate = dateStr
+        const endDate = dateStr
+        
+        try {
+          // Try to fetch ERA5 data which could be used for heatmap
+          const era5Data = await apiService.getERA5Data(bbox, startDate, endDate, ['t2m'])
+          
+          // Convert ERA5 data to heatmap points if available
+          if (era5Data && era5Data.data && Array.isArray(era5Data.data)) {
+            const heatmapPoints: HeatmapDataPoint[] = era5Data.data.map((point: any) => ({
+              position: [point.longitude || point.lon, point.latitude || point.lat],
+              weight: point.temperature || point.t2m || 0
+            }))
+            setData(heatmapPoints)
+          } else {
+            // No heatmap data available - return empty instead of mock
+            setData([])
+          }
+        } catch (apiError) {
+          // API endpoint not available or failed - return empty data
+          console.warn('Heatmap API endpoint not available:', apiError)
+          setData([])
+        }
       } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err))
         setError(error)
@@ -44,60 +73,5 @@ export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
   }, [date, variable, enabled])
 
   return { data, loading, error }
-}
-
-/**
- * Generate mock heatmap data for demonstration
- * In production, this would fetch from backend API
- */
-function generateMockHeatmapData(
-  _date?: Date,
-  variable: 'temperature' | 'ndvi' | 'uhi' = 'temperature'
-): HeatmapDataPoint[] {
-  const data: HeatmapDataPoint[] = []
-  
-  // Paris area bounds
-  const lonMin = 2.2
-  const lonMax = 2.5
-  const latMin = 48.8
-  const latMax = 49.0
-  
-  // Generate grid of points
-  const nPoints = 100
-  const stepLon = (lonMax - lonMin) / Math.sqrt(nPoints)
-  const stepLat = (latMax - latMin) / Math.sqrt(nPoints)
-  
-  for (let i = 0; i < Math.sqrt(nPoints); i++) {
-    for (let j = 0; j < Math.sqrt(nPoints); j++) {
-      const lon = lonMin + i * stepLon
-      const lat = latMin + j * stepLat
-      
-      // Generate mock temperature (warmer in center = urban heat island)
-      const centerLon = (lonMin + lonMax) / 2
-      const centerLat = (latMin + latMax) / 2
-      const dist = Math.sqrt(
-        Math.pow(lon - centerLon, 2) + Math.pow(lat - centerLat, 2)
-      )
-      
-      let weight: number
-      if (variable === 'temperature') {
-        // Urban heat island effect: warmer in center
-        weight = 20 + 8 * Math.exp(-dist * 10) + Math.random() * 2
-      } else if (variable === 'ndvi') {
-        // NDVI: higher in green areas
-        weight = 0.3 + 0.4 * Math.exp(-dist * 5) + Math.random() * 0.2
-      } else {
-        // UHI intensity
-        weight = dist * 2 + Math.random() * 0.5
-      }
-      
-      data.push({
-        position: [lon, lat],
-        weight
-      })
-    }
-  }
-  
-  return data
 }
 

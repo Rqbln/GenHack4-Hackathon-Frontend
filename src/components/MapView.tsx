@@ -14,6 +14,7 @@ import { useAsyncLayer } from '../hooks/useAsyncLayer'
 import { useHeatmapData } from '../hooks/useHeatmapData'
 import { useStations } from '../hooks/useStations'
 import { waitForWebGL } from '../utils/webglCheck'
+import { apiService } from '../services/api'
 import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (light theme)
@@ -27,33 +28,7 @@ const INITIAL_VIEW_STATE = {
   bearing: 0
 }
 
-// Mock stations data (will be replaced with real ECA&D data)
-const MOCK_STATIONS: Station[] = [
-  {
-    staid: 1,
-    staname: 'Paris Montsouris',
-    country: 'FRA',
-    latitude: 48.8222,
-    longitude: 2.3364,
-    elevation: 75
-  },
-  {
-    staid: 2,
-    staname: 'Paris Orly',
-    country: 'FRA',
-    latitude: 48.7233,
-    longitude: 2.3794,
-    elevation: 89
-  },
-  {
-    staid: 3,
-    staname: 'Paris Le Bourget',
-    country: 'FRA',
-    latitude: 48.9694,
-    longitude: 2.4414,
-    elevation: 66
-  }
-]
+// Stations are now loaded from API only - no mock data
 
 export default function MapView() {
   const [viewState, setViewState] = useState(INITIAL_VIEW_STATE)
@@ -69,32 +44,40 @@ export default function MapView() {
   // Fetch stations from API
   const { stations: apiStations, loading: stationsLoading } = useStations()
   
-  // Use API stations if available, otherwise fallback to mock
-  // Memoize to prevent unnecessary re-renders
+  // Use API stations only - no mock fallback
   const stations = useMemo(() => {
-    return apiStations.length > 0 ? apiStations : MOCK_STATIONS
+    return apiStations
   }, [apiStations])
 
   // Timeline dates
   const startDate = new Date('2020-01-01')
   const endDate = new Date('2021-12-31')
 
-  // Mock time series data (will be replaced with real ECA&D data)
-  const loadStationData = useCallback((station: Station) => {
-    // Generate mock time series data
-    const mockData: StationData[] = []
-    const startDate = new Date('2020-01-01')
-    for (let i = 0; i < 365; i++) {
-      const date = new Date(startDate)
-      date.setDate(date.getDate() + i)
-      mockData.push({
+  // Load real time series data from API
+  const loadStationData = useCallback(async (station: Station) => {
+    try {
+      const startDate = '2020-01-01'
+      const endDate = '2021-12-31'
+      const temperatureData = await apiService.getStationTemperature(
+        station.staid,
+        startDate,
+        endDate
+      )
+      
+      // Convert API response to StationData format
+      const stationDataArray: StationData[] = temperatureData.map((item: any) => ({
         station,
-        date: date.toISOString().split('T')[0],
-        temperature: 15 + 10 * Math.sin((i / 365) * 2 * Math.PI) + Math.random() * 5,
-        quality: 0
-      })
+        date: item.date,
+        temperature: item.temperature,
+        quality: item.quality || 0
+      }))
+      
+      setStationData(stationDataArray)
+    } catch (error) {
+      console.error('Failed to load station temperature data:', error)
+      // If API fails, show empty data instead of mock
+      setStationData([])
     }
-    setStationData(mockData)
   }, [])
 
   // Memoize stations array to prevent unnecessary re-renders
@@ -110,9 +93,9 @@ export default function MapView() {
     return createStationLayer({
       stations: stations,
       selectedStationId: selectedStation?.staid,
-      onStationClick: (station) => {
+      onStationClick: async (station) => {
         setSelectedStation(station)
-        loadStationData(station)
+        await loadStationData(station)
         console.log('Station selected:', station)
       },
       visible: true

@@ -68,16 +68,19 @@ class ApiService {
   ): Promise<TemperatureData[]> {
     try {
       const params = new URLSearchParams()
+      params.append('station_id', stationId.toString())
       if (startDate) params.append('start_date', startDate)
       if (endDate) params.append('end_date', endDate)
 
-      const url = `${this.baseUrl}/api/stations/${stationId}/temperature?${params.toString()}`
+      const url = `${this.baseUrl}/api/temperature?${params.toString()}`
       const response = await fetch(url)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-      return await response.json()
+      const data = await response.json()
+      // Handle both {data: [...]} and [...] formats
+      return Array.isArray(data) ? data : (data.data || [])
     } catch (error) {
       console.error(`Failed to fetch temperature for station ${stationId}:`, error)
       throw error

@@ -10,6 +10,8 @@ import TimelineSlider from './TimelineSlider'
 import BackendConnectionStatus from './BackendConnectionStatus'
 import DemoMode from './DemoMode'
 import { useAsyncLayer } from '../hooks/useAsyncLayer'
+import { useStations } from '../hooks/useStations'
+import { apiService } from '../services/api'
 import type { Station, StationData } from '../types/station'
 
 // MapLibre style URL (dark theme)
@@ -76,70 +78,68 @@ export default function MapViewWithTransitions({
     }
   }, [animatedViewState, transitionDuration, onViewStateChange])
 
-  // Mock stations data
-  const MOCK_STATIONS: Station[] = [
-    {
-      staid: 1,
-      staname: 'Paris Montsouris',
-      country: 'FRA',
-      latitude: 48.8222,
-      longitude: 2.3364,
-      elevation: 75
-    },
-    {
-      staid: 2,
-      staname: 'Paris Orly',
-      country: 'FRA',
-      latitude: 48.7233,
-      longitude: 2.3794,
-      elevation: 89
-    },
-    {
-      staid: 3,
-      staname: 'Paris Le Bourget',
-      country: 'FRA',
-      latitude: 48.9694,
-      longitude: 2.4414,
-      elevation: 66
-    }
-  ]
+  // Fetch stations from API
+  const { stations: apiStations, loading: stationsLoading } = useStations()
+  
+  // Use API stations only - no mock fallback
+  const stations = useMemo(() => {
+    return apiStations
+  }, [apiStations])
 
-  // Mock time series data
-  const loadStationData = (station: Station) => {
-    const mockData: StationData[] = []
-    const startDate = new Date('2020-01-01')
-    for (let i = 0; i < 365; i++) {
-      const date = new Date(startDate)
-      date.setDate(date.getDate() + i)
-      mockData.push({
+  // Load real time series data from API
+  const loadStationData = useCallback(async (station: Station) => {
+    try {
+      const startDate = '2020-01-01'
+      const endDate = '2021-12-31'
+      const temperatureData = await apiService.getStationTemperature(
+        station.staid,
+        startDate,
+        endDate
+      )
+      
+      // Convert API response to StationData format
+      const stationDataArray: StationData[] = temperatureData.map((item: any) => ({
         station,
-        date: date.toISOString().split('T')[0],
-        temperature: 15 + 10 * Math.sin((i / 365) * 2 * Math.PI) + Math.random() * 5,
-        quality: 0
-      })
+        date: item.date,
+        temperature: item.temperature,
+        quality: item.quality || 0
+      }))
+      
+      setStationData(stationDataArray)
+    } catch (error) {
+      console.error('Failed to load station temperature data:', error)
+      // If API fails, show empty data instead of mock
+      setStationData([])
     }
-    setStationData(mockData)
-  }
+  }, [])
+
+  // Memoize stations array to prevent unnecessary re-renders
+  const stationsKey = useMemo(() => {
+    return stations.map(s => s.staid).join(',')
+  }, [stations])
 
   // Create station layer with async loading
   const createStationLayerAsync = useCallback(() => {
+    if (!stations || stations.length === 0) {
+      return null
+    }
     return createStationLayer({
-      stations: MOCK_STATIONS,
+      stations: stations,
       selectedStationId: selectedStation?.staid,
-      onStationClick: (station) => {
+      onStationClick: async (station) => {
         setSelectedStation(station)
-        loadStationData(station)
+        await loadStationData(station)
         console.log('Station selected:', station)
       },
       visible: true
     })
-  }, [selectedStation])
+  }, [selectedStation?.staid, stationsKey, loadStationData, stations])
 
   const [stationLayer, _stationLoading, _stationError] = useAsyncLayer(
     createStationLayerAsync,
-    [selectedStation],
+    [selectedStation?.staid, stationsKey],
     {
-      enabled: true,
+      enabled: stations.length > 0,
       onError: (error) => {
         console.error('Failed to load station layer:', error)
       }
@@ -201,7 +201,8 @@ export default function MapViewWithTransitions({
       <div className="absolute top-4 left-4 bg-gray-800 bg-opacity-90 p-4 rounded-lg shadow-lg max-w-sm">
         <h1 className="text-xl font-bold mb-2">GenHack 2025 - Climate Heat Dashboard</h1>
         <p className="text-sm text-gray-300 mb-2">
-          {MOCK_STATIONS.length} weather stations loaded
+          {stationsLoading ? 'Loading stations...' : `${stations.length} weather stations loaded`}
+          {apiStations.length > 0 && <span className="text-green-400 ml-2">(from API)</span>}
         </p>
         {selectedStation && (
           <div className="mt-2 pt-2 border-t border-gray-600">
