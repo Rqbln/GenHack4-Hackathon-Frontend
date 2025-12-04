@@ -146,6 +146,33 @@ class ApiService {
   }
 
   /**
+   * Fetch heatmap data for a specific date
+   */
+  async getHeatmapData(
+    date: string,
+    bbox?: [number, number, number, number]
+  ): Promise<any> {
+    try {
+      const params = new URLSearchParams()
+      params.append('date', date)
+      if (bbox) {
+        params.append('bbox', bbox.join(','))
+      }
+
+      const url = `${this.baseUrl}/api/heatmap?${params.toString()}`
+      const response = await fetch(url)
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      return await response.json()
+    } catch (error) {
+      console.error('Failed to fetch heatmap data:', error)
+      throw error
+    }
+  }
+
+  /**
    * Health check
    */
   async healthCheck(): Promise<boolean> {

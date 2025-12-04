@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react'
 import type { HeatmapDataPoint } from '../components/HeatmapLayer'
 import { apiService } from '../services/api'
 
+// Expose baseUrl for direct fetch (workaround)
+declare module '../services/api' {
+  interface ApiService {
+    baseUrl: string
+  }
+}
+
 interface UseHeatmapDataOptions {
   date?: Date
   variable?: 'temperature' | 'ndvi' | 'uhi'
@@ -28,39 +35,47 @@ export function useHeatmapData(options: UseHeatmapDataOptions = {}) {
       setLoading(true)
       setError(null)
 
-      try {
-        // Try to fetch heatmap data from API
-        // For now, the API doesn't have a heatmap endpoint yet
-        // So we return empty data instead of generating mock data
-        // TODO: Implement /api/heatmap endpoint in backend
-        const dateStr = date ? date.toISOString().split('T')[0] : '2020-01-01'
-        
-        // Paris bounding box
-        const bbox: [number, number, number, number] = [2.2, 48.8, 2.5, 49.0]
-        const startDate = dateStr
-        const endDate = dateStr
-        
         try {
-          // Try to fetch ERA5 data which could be used for heatmap
-          const era5Data = await apiService.getERA5Data(bbox, startDate, endDate, ['t2m'])
+          const dateStr = date ? date.toISOString().split('T')[0] : '2020-01-01'
           
-          // Convert ERA5 data to heatmap points if available
-          if (era5Data && era5Data.data && Array.isArray(era5Data.data)) {
-            const heatmapPoints: HeatmapDataPoint[] = era5Data.data.map((point: any) => ({
-              position: [point.longitude || point.lon, point.latitude || point.lat],
-              weight: point.temperature || point.t2m || 0
-            }))
-            setData(heatmapPoints)
-          } else {
-            // No heatmap data available - return empty instead of mock
+          // Paris bounding box
+          const bbox: [number, number, number, number] = [2.2, 48.8, 2.5, 49.0]
+          
+          try {
+            // Try to fetch heatmap data from API
+            const bboxStr = bbox.join(',')
+            const url = `${apiService['baseUrl']}/api/heatmap?date=${dateStr}&bbox=${bboxStr}`
+            const response = await fetch(url)
+            
+            if (response.ok) {
+              const result = await response.json()
+              if (result && result.data && Array.isArray(result.data)) {
+                const heatmapPoints: HeatmapDataPoint[] = result.data.map((point: any) => ({
+                  position: point.position || [point.lon || point.longitude, point.lat || point.latitude],
+                  weight: point.weight || point.temperature || 0
+                }))
+                setData(heatmapPoints)
+              } else {
+                setData([])
+              }
+            } else {
+              // Fallback to ERA5 endpoint
+              const era5Data = await apiService.getERA5Data(bbox, dateStr, dateStr, ['t2m'])
+              if (era5Data && era5Data.data && Array.isArray(era5Data.data)) {
+                const heatmapPoints: HeatmapDataPoint[] = era5Data.data.map((point: any) => ({
+                  position: [point.longitude || point.lon, point.latitude || point.lat],
+                  weight: point.temperature || point.t2m || 0
+                }))
+                setData(heatmapPoints)
+              } else {
+                setData([])
+              }
+            }
+          } catch (apiError) {
+            console.warn('Heatmap API endpoint not available:', apiError)
             setData([])
           }
-        } catch (apiError) {
-          // API endpoint not available or failed - return empty data
-          console.warn('Heatmap API endpoint not available:', apiError)
-          setData([])
-        }
-      } catch (err) {
+        } catch (err) {
         const error = err instanceof Error ? err : new Error(String(err))
         setError(error)
         setData([])
